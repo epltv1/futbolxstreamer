@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/bot.py": {
+      "runtime": "python@3.11"
+    }
+  },
   "routes": [
     {
       "src": "/api/bot",
