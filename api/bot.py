@@ -50,7 +50,7 @@ async def stream_to_rtmp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         f"Run this command on a server with FFmpeg to stream:\n{ffmpeg_command}"
     )
 
-async def webhook(request):
+async def handler(request):
     try:
         application = Application.builder().token(BOT_TOKEN).build()
         application.add_handler(CommandHandler("start", start))
@@ -62,7 +62,7 @@ async def webhook(request):
             "body": json.dumps({"message": "Update processed"})
         }
     except Exception as e:
-        logger.error(f"Error in webhook: {e}")
+        logger.error(f"Error in handler: {e}")
         return {
             "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
             "body": json.dumps({"error": str(e)})
