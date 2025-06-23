@@ -3,7 +3,6 @@ import os
 import aiohttp
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-from http import HTTPStatus
 import json
 
 # Configure logging
@@ -50,20 +49,24 @@ async def stream_to_rtmp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         f"Run this command on a server with FFmpeg to stream:\n{ffmpeg_command}"
     )
 
-async def handler(request):
+async def handler(event, context):
     try:
+        # Parse the incoming request body
+        body = json.loads(event.get("body", "{}"))
         application = Application.builder().token(BOT_TOKEN).build()
         application.add_handler(CommandHandler("start", start))
         application.add_handler(CommandHandler("stream", stream_to_rtmp))
-        update = Update.de_json(await request.get_json(force=True), application.bot)
+        update = Update.de_json(body, application.bot)
         await application.process_update(update)
         return {
-            "statusCode": HTTPStatus.OK,
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"message": "Update processed"})
         }
     except Exception as e:
         logger.error(f"Error in handler: {e}")
         return {
-            "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"error": str(e)})
         }
